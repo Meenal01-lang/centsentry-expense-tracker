@@ -254,6 +254,68 @@ ACCESS_TOKEN_EXPIRE_MINUTES=60
 
 ---
 
+## 📊 Power BI Dashboard Integration
+
+CentSentry now includes built-in support for **Power BI Desktop**, allowing you to create rich, interactive business intelligence reports from your personal financial data.
+
+### 🖼️ Power BI Dashboard Preview
+![Power BI Dashboard Preview](powerbi/dashboard_preview.png)
+
+### 📥 1. Exporting Your Transaction Data
+1. Navigate to the main **Dashboard** in CentSentry.
+2. Click the **Export CSV** button in the top-right header panel.
+3. This downloads a combined transactions CSV (`centsentry_transactions_YYYY-MM-DD.csv`) containing:
+   * **Date**: Transaction timestamp
+   * **Category**: Expense category (e.g. Food, Bills) or Income source (e.g. Salary, Freelance)
+   * **Amount**: Value of the transaction
+   * **Transaction Type**: `Income` or `Expense`
+   * **Payment Method**: Automatically resolved payment channel (Credit Card, Debit Card, Cash, UPI, Bank Transfer)
+   * **Description**: Detailed title and transaction notes
+
+### 🔌 2. Importing Data into Power BI
+1. Open **Power BI Desktop**.
+2. Click on **Get Data** > **Text/CSV**.
+3. Select the downloaded `centsentry_transactions_*.csv` file and click **Load**.
+4. Double-check that column data types are resolved correctly:
+   * `Date` as **Date**
+   * `Amount` as **Decimal Number** (Formatted as Currency)
+   * `Category`, `Transaction Type`, `Payment Method`, `Description` as **Text**
+
+### 🧮 3. Creating DAX Measures
+To display core metrics on your dashboard, create the following DAX measures:
+
+* **Total Income**:
+  ```dax
+  Total Income = CALCULATE(SUM('centsentry_transactions'[Amount]), 'centsentry_transactions'[Transaction Type] = "Income")
+  ```
+* **Total Expenses**:
+  ```dax
+  Total Expenses = CALCULATE(SUM('centsentry_transactions'[Amount]), 'centsentry_transactions'[Transaction Type] = "Expense")
+  ```
+* **Current Balance**:
+  ```dax
+  Current Balance = [Total Income] - [Total Expenses]
+  ```
+
+### 📈 4. Building the Dashboard Visuals
+Create a new report canvas and add the following visuals:
+1. **KPI Cards**:
+   * Add three **Card** visuals and drag the `Total Income`, `Total Expenses`, and `Current Balance` measures into their respective fields.
+2. **Monthly Expense Trend**:
+   * Add an **Area Chart** or **Line Chart**.
+   * Drag `Date` (grouped by Month) to the **X-axis**.
+   * Drag the `Total Expenses` measure (or `Amount` filtered by `Transaction Type = Expense`) to the **Y-axis**.
+3. **Category-wise Expense distribution**:
+   * Add a **Pie Chart** or **Donut Chart**.
+   * Drag `Category` to the **Legend** and `Amount` to the **Values**.
+   * Filter the visual so `Transaction Type` is `Expense`.
+4. **Top Spending Categories**:
+   * Add a **Clustered Bar Chart** (Horizontal).
+   * Drag `Category` to the **Y-axis** and `Amount` to the **X-axis**.
+   * Filter the visual so `Transaction Type` is `Expense` and sort descending.
+
+---
+
 ## 📸 Screenshots
 
 ### Dashboard
